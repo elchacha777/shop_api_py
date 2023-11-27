@@ -9,3 +9,6 @@ sqlparse==0.4.4
 djangorestframework-simplejwt
 twilio
 drf-yasg
+django-filter
+celery
+redis

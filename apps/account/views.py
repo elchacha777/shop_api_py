@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from .send_mail import send_confirmation_email
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from config.tasks import  send_activation_sms_task, send_confirmation_email_task
 from .send_sms import send_activation_sms
 
 User = get_user_model()
@@ -22,7 +22,8 @@ class RegistrationView(APIView):
         user = serializer.save()
         if user:
             try:
-                send_confirmation_email(user.email, user.activation_code)
+                # send_confirmation_email(user.email, user.activation_code)
+                send_confirmation_email_task.delay(user.email, user.activation_code)
             except:
                 return Response({'message': 'Registered, but troubleswith email', 'data': serializer.data}, status=201)
         return Response(serializer.data, status=201)
@@ -57,7 +58,8 @@ class RegistrationPhoneView(GenericAPIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
-            send_activation_sms(user.phone_number, user.activation_code)
+            # send_activation_sms(user.phone_number, user.activation_code)
+            send_activation_sms_task.delay(user.phone_number, user.activation_code)
             return Response('Succesfully registered', status=201)
 
 
