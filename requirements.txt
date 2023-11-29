@@ -12,3 +12,4 @@ drf-yasg
 django-filter
 celery
 redis
+gunicorn
